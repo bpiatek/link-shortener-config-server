@@ -39,7 +39,7 @@ jobs:
       - name: Define Image Name
         id: image_name
         run: |
-          NAME=kafka-consumer
+          NAME=link-shortener-config-server
           echo "name=$NAME" >> $GITHUB_OUTPUT
           echo "Image name set to $NAME"
 
@@ -87,7 +87,7 @@ jobs:
           set -euo pipefail
           echo "Deploying with Helm..."
           sudo /snap/bin/microk8s helm upgrade --install \
-            kafka-consumer-${{ github.event.inputs.environment }} \
+            link-shortener-config-server-${{ github.event.inputs.environment }} \
             ./helm \
             --namespace ${{ github.event.inputs.environment }} \
             --values helm/values-${{ github.event.inputs.environment }}.yaml \
