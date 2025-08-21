@@ -1,3 +1,5 @@
+
+
 spring:
   profiles:
     active: "dev"
@@ -5,7 +7,8 @@ spring:
 vault:
   role: "link-shortener-config-server-dev-role"
   secretPath: "kv/data/dev/link-shortener-config-server/config"
+
   secretTemplate: |
     {{- with secret "kv/data/dev/link-shortener-config-server/config" -}}
-    {{- .Data.data.privateKey | base64Decode -}}
+    {{- .Data.data.githubToken -}}
     {{- end -}}

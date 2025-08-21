@@ -1,3 +1,4 @@
+# helm/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -15,25 +16,31 @@ spec:
       labels:
         app: {{ .Release.Name }}-{{ .Chart.Name }}
       annotations:
+        # --- This is now clean and generic ---
         vault.hashicorp.com/agent-inject: "true"
-        vault.hashicorp.com/role: "link-shortener-config-server-dev-role"
-        vault.hashicorp.com/agent-inject-secret-github.token: "kv/data/dev/link-shortener-config-server/config"
+        vault.hashicorp.com/role: {{ .Values.vault.role | quote }}
+        vault.hashicorp.com/agent-inject-secret-github.token: {{ .Values.vault.secretPath | quote }}
+        # This line now safely inserts the template string from your values file.
         vault.hashicorp.com/agent-inject-template-github.token: |
-          {{- with secret "kv/data/dev/link-shortener-config-server/config" -}}
-          {{- .Data.data.githubToken -}}
-          {{- end -}}
+          {{- .Values.vault.secretTemplate | nindent 10 }}
+        vault.hashicorp.com/auth-path: "auth/kubernetes"
 
     spec:
-      serviceAccountName: config-server
+      serviceAccountName: {{ .Values.serviceAccount.name }}
       containers:
-        - name: helm
-          image: your-image:tag
+        - name: {{ .Chart.Name }} # Changed from 'helm' to be generic
+          image: {{ printf "%s:%s" .Values.image.repository .Values.image.tag | quote }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: SPRING_PROFILES_ACTIVE
-              value: "dev"
+              value: "{{ .Values.spring.profiles.active }}"
+            # This part is more complex, let's simplify it for now.
+            # We will inject the secret directly into an environment variable.
             - name: GITHUB_TOKEN
               valueFrom:
                 secretKeyRef:
+                  # This is a special secret created by the Vault agent.
+                  # The name is derived from the annotation key.
                   name: vault-secret-github.token
                   key: secret
           resources:
