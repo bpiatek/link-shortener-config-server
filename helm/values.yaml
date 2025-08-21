@@ -1,0 +1,26 @@
+replicaCount: 1
+
+image:
+  repository: link-shortener-config-server
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+serviceAccount:
+  name: link-shortener-config-server
+
+spring:
+  profiles:
+    active: "default"
+
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "500m"
+  limits:
+    memory: "1Gi"
+    cpu: "1"
+
+vault:
+  role: ""
+  secretPath: ""
+  secretTemplate: ""
