@@ -16,32 +16,21 @@ spec:
       labels:
         app: {{ .Release.Name }}-{{ .Chart.Name }}
       annotations:
-        # --- This is now clean and generic ---
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/role: {{ .Values.vault.role | quote }}
-        vault.hashicorp.com/agent-inject-secret-github.token: {{ .Values.vault.secretPath | quote }}
-        # This line now safely inserts the template string from your values file.
-        vault.hashicorp.com/agent-inject-template-github.token: |
+        vault.hashicorp.com/agent-inject-secret-application.properties: { { .Values.vault.secretPath | quote } }
+        vault.hashicorp.com/agent-inject-template-application.properties: |
           {{- .Values.vault.secretTemplate | nindent 10 }}
         vault.hashicorp.com/auth-path: "auth/kubernetes"
 
     spec:
       serviceAccountName: {{ .Values.serviceAccount.name }}
       containers:
-        - name: {{ .Chart.Name }} # Changed from 'helm' to be generic
+        - name: {{ .Chart.Name }}
           image: {{ printf "%s:%s" .Values.image.repository .Values.image.tag | quote }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: "{{ .Values.spring.profiles.active }}"
-            # This part is more complex, let's simplify it for now.
-            # We will inject the secret directly into an environment variable.
-            - name: GITHUB_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  # This is a special secret created by the Vault agent.
-                  # The name is derived from the annotation key.
-                  name: vault-secret-github.token
-                  key: secret
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
