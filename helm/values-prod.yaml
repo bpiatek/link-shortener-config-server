@@ -1,11 +1,16 @@
+replicaCount: 1
+
 spring:
   profiles:
     active: "prod"
 
 vault:
-  role: "link-shortener-config-server-dev-role"
-  secretPath: "kv/data/prod/link-shortener-config-server/config"
+  role: link-shortener-config-server-prod-role
+  secretPath: kv/data/prod/link-shortener-config-server/config
+
   secretTemplate: |
     {{- with secret "kv/data/prod/link-shortener-config-server/config" -}}
-    {{- .Data.data.privateKey | base64Decode -}}
-    {{- end -}}
+    {{- range $key, $value := .Data.data }}
+    {{ $key }}={{ $value }}
+    {{- end }}
+    {{- end }}

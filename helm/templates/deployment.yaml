@@ -22,12 +22,11 @@ spec:
         vault.hashicorp.com/agent-inject-template-application.properties: |
           {{- .Values.vault.secretTemplate | nindent 10 }}
         vault.hashicorp.com/auth-path: "auth/kubernetes"
-
     spec:
       serviceAccountName: {{ .Values.serviceAccount.name }}
       containers:
         - name: {{ .Chart.Name }}
-          image: {{ printf "%s:%s" .Values.image.repository .Values.image.tag | quote }}
+          image:  "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: SPRING_PROFILES_ACTIVE

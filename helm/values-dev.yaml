@@ -1,14 +1,16 @@
-
+replicaCount: 1
 
 spring:
   profiles:
     active: "dev"
 
 vault:
-  role: "link-shortener-config-server-dev-role"
-  secretPath: "kv/data/dev/link-shortener-config-server/config"
+  role: link-shortener-config-server-dev-role
+  secretPath: kv/data/dev/link-shortener-config-server/config
 
   secretTemplate: |
     {{- with secret "kv/data/dev/link-shortener-config-server/config" -}}
-    {{- .Data.data.githubToken -}}
-    {{- end -}}
+    {{- range $key, $value := .Data.data }}
+    {{ $key }}={{ $value }}
+    {{- end }}
+    {{- end }}
