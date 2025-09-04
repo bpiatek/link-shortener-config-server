@@ -19,8 +19,3 @@ resources:
   limits:
     memory: "1Gi"
     cpu: "1"
-
-vault:
-  role: ""
-  secretPath: ""
-  secretTemplate: ""
