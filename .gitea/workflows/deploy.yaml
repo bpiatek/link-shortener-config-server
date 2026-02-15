@@ -73,12 +73,27 @@ jobs:
           docker image ls | grep ${{ steps.image_name.outputs.name }} | grep ${{ steps.get_tag.outputs.tag }}
           echo "✅ Docker image is present"
 
-      - name: Import Image into MicroK8s
+      - name: Export Docker Image to File
         run: |
-          echo "Importing image into microk8s..."
-          echo "${{ steps.image_name.outputs.name }}:${{ steps.get_tag.outputs.tag }}"
-          set -x
-          docker save ${{ steps.image_name.outputs.name }}:${{ steps.get_tag.outputs.tag }} | sudo /snap/bin/microk8s ctr --namespace k8s.io image import -
+          echo "Saving image to tar file..."
+          docker save -o my-image.tar ${{ steps.image_name.outputs.name }}:${{ steps.get_tag.outputs.tag }}
+          ls -lh my-image.tar  # Verify file size
+
+      - name: Import Image into MicroK8s (File based)
+        run: |
+          echo "Importing tar file into k8s.io namespace..."
+          # Note: We pass the filename directly, no piping
+          sudo /snap/bin/microk8s ctr --namespace k8s.io image import my-image.tar
+          
+          # Cleanup to save space
+          rm my-image.tar
+
+#      - name: Import Image into MicroK8s
+#        run: |
+#          echo "Importing image into microk8s..."
+#          echo "${{ steps.image_name.outputs.name }}:${{ steps.get_tag.outputs.tag }}"
+#          set -x
+#          docker save ${{ steps.image_name.outputs.name }}:${{ steps.get_tag.outputs.tag }} | sudo /snap/bin/microk8s ctr --namespace k8s.io image import -
 
       - name: Debug MicroK8s Helm Access
         run: |
