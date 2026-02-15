@@ -78,8 +78,7 @@ jobs:
           echo "Importing image into microk8s..."
           echo "${{ steps.image_name.outputs.name }}:${{ steps.get_tag.outputs.tag }}"
           set -x
-          docker save ${{ steps.image_name.outputs.name }}:${{ steps.get_tag.outputs.tag }} | sudo /snap/bin/microk8s ctr image import -
-          echo "✅ Image import completed"
+          docker save ${{ steps.image_name.outputs.name }}:${{ steps.get_tag.outputs.tag }} | sudo /snap/bin/microk8s ctr image import --namespace k8s.io -          echo "✅ Image import completed"
 
       - name: Debug MicroK8s Helm Access
         run: |
