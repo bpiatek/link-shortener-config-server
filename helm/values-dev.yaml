@@ -4,6 +4,10 @@ spring:
   profiles:
     active: "dev"
 
+env:
+  - name: JAVA_TOOL_OPTIONS
+    value: "-XX:MaxRAMPercentage=65.0 -XX:+UseG1GC"
+
 vault:
   role: "link-shortener-config-server-dev-role"
   secretPath: "kv/data/dev/link-shortener-config-server/config"
